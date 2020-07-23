@@ -18,8 +18,7 @@ class __plugin__(object):
         @self.hub.spawn
         def _():
             for data in self.recver:
-                for x in data:
-                    sig = ord(x)
+                for sig in data:
                     self.mapper[sig].send(sig)
             self.recver.close()
             self.fd_w = self.recver = None
@@ -33,7 +32,7 @@ class __plugin__(object):
             # interrupt, so we write directly to a file descriptor instead of
             # using an io.pipe()
             if self.fd_w:
-                os.write(self.fd_w, chr(sig))
+                os.write(self.fd_w, chr(sig).encode())
 
         self.mapper[sig] = self.hub.broadcast()
         self.mapper[sig].onempty(self.uncapture, sig)

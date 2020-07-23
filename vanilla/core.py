@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 
 import collections
 import functools
@@ -7,7 +6,6 @@ import logging
 import signal
 import heapq
 import time
-
 
 from greenlet import getcurrent
 from greenlet import greenlet
@@ -99,7 +97,7 @@ class Hub(object):
             plugin = module.__plugin__(self)
             setattr(self, name, plugin)
             return plugin
-        except Exception, e:
+        except Exception as e:
             log.exception(e)
             raise AttributeError(
                 "'Hub' object has no attribute '{name}'\n"
@@ -227,7 +225,7 @@ class Hub(object):
             for f, a, kw, r in s.recver:
                 try:
                     r.send(f(*a, **kw))
-                except Exception, e:
+                except Exception as e:
                     r.send(e)
 
         def _(*a, **kw):
@@ -278,10 +276,10 @@ class Hub(object):
                     elif end == downstream:
                         end.send(current)
         """
+
         for end in ends:
             if end.ready:
-                return end, isinstance(
-                    end, vanilla.message.Recver) and end.recv() or None
+                return end, isinstance(end, vanilla.message.Recver) and end.recv() or None
 
         for end in ends:
             end.select()
@@ -315,8 +313,7 @@ class Hub(object):
 
         # TODO: rework State's is set test to be more natural
         if self.stopped.recver.ready:
-            raise vanilla.exception.Stop(
-                'Hub stopped while we were paused. There must be a deadlock.')
+            raise vanilla.exception.Stop('Hub stopped while we were paused. There must be a deadlock.')
 
         return resume
 
@@ -381,29 +378,35 @@ class Hub(object):
     def register(self, fd, *masks):
         ret = []
         self.registered[fd] = {}
+
         for mask in masks:
             sender, recver = self.pipe()
             self.registered[fd][mask] = sender
             ret.append(recver)
+
         self.poll.register(fd, *masks)
+
         if len(ret) == 1:
             return ret[0]
+
         return ret
 
     def unregister(self, fd):
         if fd in self.registered:
             masks = self.registered.pop(fd)
+
             try:
                 self.poll.unregister(fd, *(masks.keys()))
             except:
                 pass
+
             for mask in masks:
                 masks[mask].close()
 
     def stop(self):
         self.sleep(1)
 
-        for fd, masks in self.registered.items():
+        for fd, masks in list(self.registered.items()):
             for mask, sender in masks.items():
                 sender.stop()
 
@@ -426,7 +429,7 @@ class Hub(object):
                 task.switch(*a)
             else:
                 greenlet(task).switch(*a)
-        except Exception, e:
+        except Exception as e:
             self.log.warn('Exception leaked back to main loop', exc_info=e)
 
     def dispatch_events(self, events):
@@ -436,9 +439,8 @@ class Hub(object):
                 if mask == vanilla.poll.POLLERR:
                     for sender in masks.values():
                         sender.close()
-                else:
-                    if masks[mask].ready:
-                        masks[mask].send(True)
+                elif masks[mask].ready:
+                    masks[mask].send(True)
 
     def main(self):
         """
@@ -464,6 +466,7 @@ class Hub(object):
 
             if self.scheduled:
                 timeout = self.scheduled.timeout()
+
                 # run overdue scheduled immediately
                 if timeout < 0:
                     task, a = self.scheduled.pop()
@@ -486,10 +489,12 @@ class Hub(object):
 
             # run poll
             events = None
+
             try:
                 events = self.poll.poll(timeout=timeout)
             # IOError from a signal interrupt
             except IOError:
                 pass
+
             if events:
                 self.spawn(self.dispatch_events, events)

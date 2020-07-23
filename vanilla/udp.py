@@ -58,7 +58,7 @@ def Recver(hub, sock):
             while True:
                 try:
                     got = sock.recvfrom(65507)
-                except (socket.error, OSError), e:
+                except (socket.error, OSError) as e:
                     if e.errno == errno.EAGAIN:
                         break
                     sender.close()

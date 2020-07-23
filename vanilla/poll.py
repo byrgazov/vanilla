@@ -2,8 +2,10 @@ import operator
 import select
 import errno
 
+from functools import reduce
 
-POLLIN = 1
+
+POLLIN  = 1
 POLLOUT = 2
 POLLERR = 3
 
@@ -14,10 +16,11 @@ if hasattr(select, 'kqueue'):
             self.q = select.kqueue()
 
             self.to_ = {
-                select.KQ_FILTER_READ: POLLIN,
-                select.KQ_FILTER_WRITE: POLLOUT, }
+                select.KQ_FILTER_READ : POLLIN,
+                select.KQ_FILTER_WRITE: POLLOUT,
+            }
 
-            self.from_ = dict((v, k) for k, v in self.to_.iteritems())
+            self.from_ = dict((v, k) for k, v in self.to_.items())
 
         def register(self, fd, *masks):
             for mask in masks:
@@ -40,7 +43,7 @@ if hasattr(select, 'kqueue'):
                 try:
                     events = self.q.control(None, 4, timeout)
                     break
-                except OSError, err:
+                except OSError as err:
                     if err.errno == errno.EINTR:
                         continue
                     raise
@@ -62,10 +65,11 @@ elif hasattr(select, 'epoll'):
             self.q = select.epoll()
 
             self.to_ = {
-                select.EPOLLIN: POLLIN,
-                select.EPOLLOUT: POLLOUT, }
+                select.EPOLLIN : POLLIN,
+                select.EPOLLOUT: POLLOUT,
+            }
 
-            self.from_ = dict((v, k) for k, v in self.to_.iteritems())
+            self.from_ = dict((v, k) for k, v in self.to_.items())
 
         def register(self, fd, *masks):
             masks = [self.from_[x] for x in masks] + [

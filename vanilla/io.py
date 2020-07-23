@@ -114,7 +114,7 @@ class Sender(object):
             while True:
                 try:
                     n = self.fd.write(data)
-                except (socket.error, OSError), e:
+                except (socket.error, OSError) as e:
                     if e.errno == errno.EAGAIN:
                         self.gate.clear().recv()
                         continue
@@ -145,7 +145,7 @@ def Recver(fd):
             while True:
                 try:
                     data = fd.read(16384)
-                except (socket.error, OSError), e:
+                except (socket.error, OSError) as e:
                     if e.errno == errno.EAGAIN:
                         break
                     """

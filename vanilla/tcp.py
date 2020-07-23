@@ -15,7 +15,8 @@ class __plugin__(object):
         sock.bind((host, port))
         sock.listen(socket.SOMAXCONN)
         sock.setblocking(0)
-        port = sock.getsockname()[1]
+
+        port   = sock.getsockname()[1]
         server = self.hub.register(sock.fileno(), vanilla.poll.POLLIN)
 
         @server.pipe
@@ -25,10 +26,11 @@ class __plugin__(object):
                     try:
                         conn, host = sock.accept()
                         downstream.send(self.hub.io.socket(conn))
-                    except (socket.error, OSError), e:
+                    except (socket.error, OSError) as e:
                         if e.errno == errno.EAGAIN:
                             break
                         raise
+
             self.hub.unregister(sock.fileno())
             sock.close()
 

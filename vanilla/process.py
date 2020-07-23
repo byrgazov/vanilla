@@ -167,7 +167,7 @@ class __plugin__(object):
         def tryexec(f, *a, **kw):
             try:
                 f(*a, **kw)
-            except OSError, e:
+            except OSError as e:
                 if e.errno == errno.ENOENT:
                     os._exit(127)
                 if e.errno == errno.EACCES:

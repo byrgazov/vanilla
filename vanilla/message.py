@@ -131,6 +131,7 @@ class Pipe(object):
         h.spawn(p.send, 1)
         p.recv()      # returns 1
     """
+
     def __new__(cls, hub):
         self = super(Pipe, cls).__new__(cls)
         self.hub = hub
@@ -245,6 +246,7 @@ class Sender(End):
         Send an *item* on this pair. This will block unless our Rever is ready,
         either forever or until *timeout* milliseconds.
         """
+
         if not self.ready:
             self.pause(timeout=timeout)
 
@@ -316,7 +318,6 @@ class Recver(End):
         """
         if self.ready:
             return self.other.handover(self)
-
         return self.pause(timeout=timeout)
 
     def __iter__(self):
@@ -364,6 +365,7 @@ class Recver(End):
             recver.recv() # returns 2 (0 is filtered, so 1*2)
             recver.recv() # returns 6 (2 is filtered, so 3*2)
         """
+
         if callable(target):
             sender, recver = self.hub.pipe()
 
@@ -382,8 +384,7 @@ class Recver(End):
 
             return recver
 
-        else:
-            return target.connect(self)
+        return target.connect(self)
 
     def map(self, f):
         """
@@ -399,13 +400,15 @@ class Recver(End):
             h.spawn(sender.send, 2)
             recver.recv() # returns 4
         """
+
         @self.pipe
         def recver(recver, sender):
             for item in recver:
                 try:
                     sender.send(f(item))
-                except Exception, e:
+                except Exception as e:
                     sender.send(e)
+
         return recver
 
     def consume(self, f):
@@ -657,6 +660,7 @@ class State(object):
         s.clear() # clear the current state
         s.recv()  # this will deadlock as state is not set
     """
+
     class G(object):
         def __init__(self, hub, state):
             self.hub = hub
@@ -666,7 +670,7 @@ class State(object):
         def throw(self, *a, **kw):
             self.hub.pause()
 
-        def __nonzero__(self):
+        def __bool__(self):
             return self.state != NoState
 
     class Sender(Sender):

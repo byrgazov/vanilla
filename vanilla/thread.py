@@ -19,7 +19,7 @@ class Pipe(object):
 
         def send(self, item, timeout=-1):
             self.q.append(item)
-            os.write(self.w, chr(1))
+            os.write(self.w, chr(1).encode())
 
     def __new__(cls, hub):
         r, w = os.pipe()

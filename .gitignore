@@ -20,7 +20,6 @@ _build
 *.egg-info
 dist
 build
-eggs
 parts
 bin
 include
@@ -29,7 +28,9 @@ local
 share
 var
 sdist
-develop-eggs
+.eggs
+.eggs-develop
+.parts
 .installed.cfg
 
 # Installer logs
