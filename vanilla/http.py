@@ -23,7 +23,7 @@ HTTP_VERSION = 'HTTP/1.1'
 log = logging.getLogger(__name__)
 
 
-class __plugin__(object):
+class __plugin__:
     def __init__(self, hub):
         self.hub = hub
 
@@ -112,7 +112,7 @@ def Status(code):
     return code, REASON_PHRASES[code]
 
 
-class Headers(object):
+class Headers:
     Value = collections.namedtuple('Value', ['key', 'value'])
 
     def __init__(self):
@@ -137,8 +137,7 @@ class Headers(object):
             return default
 
 
-class HTTPSocket(object):
-
+class HTTPSocket:
     def recv_headers(self):
         headers = Headers()
         while True:
@@ -168,10 +167,9 @@ class HTTPSocket(object):
 
 
 class HTTPClient(HTTPSocket):
-
     Status = collections.namedtuple('Status', ['version', 'code', 'message'])
 
-    class Response(object):
+    class Response:
         def __init__(self, status, headers, body):
             self.status = status
             self.headers = headers
@@ -402,8 +400,7 @@ class HTTPServer(HTTPSocket):
                 self.send_headers(headers)
                 self.socket.send(body)
 
-    Request = collections.namedtuple(
-        'Request', ['method', 'path', 'version', 'headers'])
+    Request = collections.namedtuple('Request', ['method', 'path', 'version', 'headers'])
 
     class Request(Request):
 
@@ -468,7 +465,7 @@ class HTTPServer(HTTPSocket):
                 break
 
 
-class WebSocket(object):
+class WebSocket:
     MASK = FIN = 0b10000000
     RSV = 0b01110000
     OP = 0b00001111
@@ -481,7 +478,7 @@ class WebSocket(object):
     OP_PING = 0x9
     OP_PONG = 0xA
 
-    SANITY = 1024**3  # limit fragments to 1GB
+    SANITY = 16 * 1024**2  # limit fragments to 16MB
 
     def __new__(cls, hub, socket, is_client=True):
         sender = hub.pipe() \
@@ -533,8 +530,8 @@ class WebSocket(object):
                 126 | MASK,
                 length)
         else:
-            assert length < WebSocket.SANITY, \
-                "Frames limited to 1Gb for sanity"
+            assert length < WebSocket.SANITY, "Frames limited to 16MB for sanity"
+
             header = struct.pack(
                 '!BBQ',
                 WebSocket.OP_TEXT | WebSocket.FIN,
@@ -576,8 +573,7 @@ class WebSocket(object):
             elif length == 127:
                 length, = struct.unpack('!Q', upstream.recv_n(8))
 
-            assert length < WebSocket.SANITY, \
-                "Frames limited to 1Gb for sanity"
+            assert length < WebSocket.SANITY, 'Frames limited to 16MB for sanity'
 
             if is_client:
                 downstream.send(upstream.recv_n(length))

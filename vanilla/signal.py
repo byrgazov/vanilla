@@ -4,7 +4,7 @@ import signal
 import os
 
 
-class __plugin__(object):
+class __plugin__:
     def __init__(self, hub):
         self.hub = hub
         self.fd_w = self.recver = None

@@ -1,4 +1,5 @@
 
+import sys
 import collections
 import functools
 import importlib
@@ -18,7 +19,7 @@ import vanilla.poll
 log = logging.getLogger(__name__)
 
 
-class lazy(object):
+class lazy:
     def __init__(self, f):
         self.f = f
 
@@ -28,7 +29,7 @@ class lazy(object):
         return value
 
 
-class Scheduler(object):
+class Scheduler:
     Item = collections.namedtuple('Item', ['due', 'action', 'args'])
 
     def __init__(self):
@@ -68,7 +69,7 @@ class Scheduler(object):
         return item.action, item.args
 
 
-class Hub(object):
+class Hub:
     """
     A Vanilla Hub is a handle to a self contained world of interwoven
     coroutines. It includes an event loop which is responsibile for scheduling
@@ -214,26 +215,40 @@ class Hub(object):
             recver = recver.pipe(self.queue(size))
         return vanilla.message.Pair(sender, recver.pipe(self.dealer()))
 
-    def serialize(self, f):
+    def serialize(self, func):
         """
         Decorator to serialize access to a callable *f*
         """
-        s = self.router()
+
+        router = self.router()
+        exc_marker = object()
 
         @self.spawn
         def _():
-            for f, a, kw, r in s.recver:
+            for args, kwargs, pipe in router.recver:
                 try:
-                    r.send(f(*a, **kw))
-                except Exception as e:
-                    r.send(e)
+                    result = func(*args, **kwargs)
+                    if isinstance(result, collections.Iterator):
+                        raise TypeError(type(result))
+                except Exception:
+                    # @todo: (?) Failure (call_stack + tb_frames)
+                    result = (exc_marker,) + sys.exc_info()
+                pipe.send(result)
 
-        def _(*a, **kw):
-            r = self.pipe()
-            s.send((f, a, kw, r))
-            return r.recv()
+        def send(*args, **kwargs):
+            # @todo: early params check
+            pipe = self.pipe()
+            router.send((args, kwargs, pipe))
 
-        return _
+            result = pipe.recv()
+
+            if type(result) is tuple and len(result) == 4 and result[0] is exc_marker:
+                etype, evalue, tb = result[1:]
+                raise evalue.with_traceback(tb)
+
+            return result
+
+        return send
 
     def broadcast(self):
         return vanilla.message.Broadcast(self)

@@ -11,8 +11,8 @@ from vanilla import message
 from vanilla.exception import Closed
 
 
-class Pipe(object):
-    class Sender(object):
+class Pipe:
+    class Sender:
         def __init__(self, q, w):
             self.q = q
             self.w = w
@@ -43,7 +43,7 @@ class Pipe(object):
         return message.Pair(sender, recver)
 
 
-class Wrap(object):
+class Wrap:
     def __init__(self, pool, target):
         self.pool = pool
         self.target = target
@@ -55,7 +55,7 @@ class Wrap(object):
         return Wrap(self.pool, getattr(self.target, name))
 
 
-class Pool(object):
+class Pool:
     def __init__(self, hub, size):
         self.hub = hub
         self.size = size
@@ -104,7 +104,7 @@ class Pool(object):
             self.requests.put(Closed())
 
 
-class __plugin__(object):
+class __plugin__:
     def __init__(self, hub):
         self.hub = hub
 

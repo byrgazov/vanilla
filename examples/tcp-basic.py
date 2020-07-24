@@ -1,11 +1,13 @@
 import vanilla
 
-h = vanilla.Hub()
+hub    = vanilla.Hub()
+server = hub.tcp.listen()
 
-server = h.tcp.listen()
+print('Listening on port: {0}'.format(server.port))
 
-print("Listening on port: {0}".format(server.port))
-
-for conn in server:
-    conn.send('Hi\n')
-    conn.close()
+try:
+    for no, conn in enumerate(server, 1):
+        conn.send('Hi ({})\n'.format(no).encode())
+        conn.close()
+except KeyboardInterrupt:
+    print('[KeyboardInterrupt]')

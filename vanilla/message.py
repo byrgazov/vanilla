@@ -9,7 +9,7 @@ import vanilla.exception
 Pair = collections.namedtuple('Pair', ['sender', 'recver'])
 
 
-class NoState(object):
+class NoState:
     """a marker to indicate no state"""
 
 
@@ -36,6 +36,7 @@ class Pair(Pair):
         sender.send('2')
         recver.recv() # returns '2'
     """
+
     def send(self, item, timeout=-1):
         """
         Send an *item* on this pair. This will block unless our Rever is ready,
@@ -104,7 +105,7 @@ class Pair(Pair):
         self.recver.close()
 
 
-class Pipe(object):
+class Pipe:
     """
     ::
 
@@ -158,7 +159,7 @@ class Pipe(object):
             self.hub.spawn(remaining.abandoned)
 
 
-class End(object):
+class End:
     def __init__(self, pipe):
         self.middle = pipe
 
@@ -511,7 +512,7 @@ def Queue(hub, size):
     return Pair(upstream.sender, downstream.recver)
 
 
-class Dealer(object):
+class Dealer:
     """
     ::
 
@@ -556,7 +557,7 @@ class Dealer(object):
         return Pair(sender, recver)
 
 
-class Router(object):
+class Router:
     """
     ::
 
@@ -577,6 +578,7 @@ class Router(object):
         r.recv() # returns 2
         r.recv() # returns 1
     """
+
     class Sender(Sender):
         def select(self):
             assert getcurrent() not in self.current
@@ -605,7 +607,7 @@ class Router(object):
         return Pair(sender, recver)
 
 
-class Broadcast(object):
+class Broadcast:
     def __init__(self, hub):
         self.hub = hub
         self.subscribers = []
@@ -637,7 +639,7 @@ class Broadcast(object):
         recver.consume(self.send)
 
 
-class State(object):
+class State:
     """
     State is a specialized `Pipe`_ which maintains the state of a previous
     send. Sends never block, but modify the object's current state.
@@ -661,7 +663,7 @@ class State(object):
         s.recv()  # this will deadlock as state is not set
     """
 
-    class G(object):
+    class G:
         def __init__(self, hub, state):
             self.hub = hub
             self.state = state
@@ -698,7 +700,7 @@ class State(object):
         return Pair(sender, recver)
 
 
-class Stream(object):
+class Stream:
     """
     A `Stream`_ is a specialized `Recver`_ which provides additional methods
     for working with streaming sources, particularly sockets and file

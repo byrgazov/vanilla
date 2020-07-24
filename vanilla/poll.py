@@ -11,7 +11,7 @@ POLLERR = 3
 
 
 if hasattr(select, 'kqueue'):
-    class Poll(object):
+    class Poll:
         def __init__(self):
             self.q = select.kqueue()
 
@@ -60,7 +60,7 @@ if hasattr(select, 'kqueue'):
 
 
 elif hasattr(select, 'epoll'):
-    class Poll(object):
+    class Poll:
         def __init__(self):
             self.q = select.epoll()
 

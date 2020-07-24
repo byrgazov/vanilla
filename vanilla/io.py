@@ -9,7 +9,7 @@ import vanilla.message
 import vanilla.poll
 
 
-class __plugin__(object):
+class __plugin__:
     def __init__(self, hub):
         self.hub = hub
 
@@ -39,7 +39,7 @@ def unblock(fileno):
     return fileno
 
 
-class FD_from_fileno_in(object):
+class FD_from_fileno_in:
     def __init__(self, hub, fileno):
         self.hub = hub
         self.fileno = fileno
@@ -57,7 +57,7 @@ class FD_from_fileno_in(object):
         self.hub.unregister(self.fileno)
 
 
-class FD_from_fileno_out(object):
+class FD_from_fileno_out:
     def __init__(self, hub, fileno):
         self.hub = hub
         self.fileno = fileno
@@ -75,7 +75,7 @@ class FD_from_fileno_out(object):
         self.hub.unregister(self.fileno)
 
 
-class FD_from_socket(object):
+class FD_from_socket:
     def __init__(self, hub, conn):
         self.hub = hub
         self.conn = conn
@@ -99,7 +99,7 @@ class FD_from_socket(object):
         self.hub.unregister(self.fileno)
 
 
-class Sender(object):
+class Sender:
     def __init__(self, fd):
         self.fd = fd
         self.hub = fd.hub
@@ -123,6 +123,7 @@ class Sender(object):
                 if n == len(data):
                     break
                 data = data[n:]
+
         self.send = send
 
     def connect(self, recver):

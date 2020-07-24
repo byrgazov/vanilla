@@ -37,13 +37,13 @@ if hasattr(select, 'epoll'):
         log.warn('unable to load libc: needed to set PR_SET_PDEATHSIG')
 
 
-class __plugin__(object):
+class __plugin__:
     def __init__(self, hub):
         self.hub = hub
         self.children = []
         self.sigchld = None
 
-    class Child(object):
+    class Child:
         def __init__(self, hub, pid):
             self.hub = hub
             self.pid = pid

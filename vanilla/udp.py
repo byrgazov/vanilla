@@ -7,7 +7,7 @@ import vanilla.message
 import vanilla.poll
 
 
-class __plugin__(object):
+class __plugin__:
     def __init__(self, hub):
         self.hub = hub
 
